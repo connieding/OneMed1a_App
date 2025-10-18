@@ -55,16 +55,40 @@ function pickCover(
  * @param {{ params: Promise<{ mediaType: string }> }} props
  */
 export default async function MediaPage({ params }) {
-  const { mediaType: rawMediaType } = await params;
+  const { mediaType: rawMediaType } = params; // no need to await params here
   const mediaTypeKey = normalizeTypeKey(rawMediaType);
-  const wantedType = typeMap[mediaTypeKey];
 
-  // Optional: guard unknown types
-  // if (!wantedType) redirect("/");
+  const cookieStore = cookies();
+  const accessTokenCookie = cookieStore.get("access_token");
 
-  // const cookieStore = await cookies(); // cookies() is async in Next 15
-  // const userId = cookieStore.get("userId")?.value;
-  // if (!userId) redirect("/");
+  if (!accessTokenCookie) {
+    redirect("/login");
+  }
+
+  // Build cookie header for fetch
+  const cookieHeader = `access_token=${accessTokenCookie.value}`;
+
+  // Fetch user profile from backend, forwarding cookies
+  const res = await fetch(
+    `${process.env.API_BASE || "http://localhost:8080"}/api/v1/getprofile`,
+    {
+      headers: {
+        cookie: cookieHeader,
+      },
+      cache: "no-store",
+    }
+  );
+
+  if (!res.ok) {
+    redirect("/login");
+  }
+
+  const profile = await res.json();
+
+  const userId = profile?.id;
+  if (!userId) {
+    redirect("/login");
+  }
 
   // Load user's tracked statuses
   let raw = [];
