@@ -14,12 +14,14 @@ function classNames(...x) {
 }
 
 function initials(name = "") {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((s) => s[0]?.toUpperCase())
-    .join("") || "U";
+  return (
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((s) => s[0]?.toUpperCase())
+      .join("") || "U"
+  );
 }
 
 function formatDate(dateStr) {
@@ -89,7 +91,9 @@ export default async function ProfilePage() {
             {name}
           </h1>
           <p className="text-slate-600 mt-1">{email}</p>
-          <p className="text-slate-500 text-sm mt-1">Joined {formatDate(joined)}</p>
+          <p className="text-slate-500 text-sm mt-1">
+            Joined {formatDate(joined)}
+          </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <a
               href="/settings"
@@ -124,15 +128,21 @@ export default async function ProfilePage() {
           <ul className="space-y-3 text-sm">
             <li className="flex items-center justify-between">
               <span>Theme</span>
-              <span className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-1">System</span>
+              <span className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-1">
+                System
+              </span>
             </li>
             <li className="flex items-center justify-between">
               <span>Region</span>
-              <span className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-1">NZ</span>
+              <span className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-1">
+                NZ
+              </span>
             </li>
             <li className="flex items-center justify-between">
               <span>Content language</span>
-              <span className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-1">English</span>
+              <span className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-1">
+                English
+              </span>
             </li>
           </ul>
         </Card>
@@ -170,21 +180,34 @@ export default async function ProfilePage() {
           <ul className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white/60 backdrop-blur">
             {activity.map((evt, idx) => (
               <li key={idx} className="p-4 flex items-start gap-3">
-                <div className={classNames(
-                  "h-9 w-9 rounded-xl grid place-items-center text-xs font-medium",
-                  iconTone(evt?.type)
-                )}>
+                <div
+                  className={classNames(
+                    "h-9 w-9 rounded-xl grid place-items-center text-xs font-medium",
+                    iconTone(evt?.type)
+                  )}
+                >
                   {iconFor(evt?.type)}
                 </div>
                 <div className="flex-1">
                   <p className="text-sm">
-                    <span className="font-medium">{evt?.title || prettyType(evt?.type)}</span>
-                    {evt?.detail ? <span className="text-slate-600"> — {evt.detail}</span> : null}
+                    <span className="font-medium">
+                      {evt?.title || prettyType(evt?.type)}
+                    </span>
+                    {evt?.detail ? (
+                      <span className="text-slate-600"> — {evt.detail}</span>
+                    ) : null}
                   </p>
-                  <p className="text-xs text-slate-500 mt-1">{formatDate(evt?.createdAt)}</p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {formatDate(evt?.createdAt)}
+                  </p>
                 </div>
                 {evt?.href ? (
-                  <a href={evt.href} className="text-sm text-slate-600 hover:text-black">Open →</a>
+                  <a
+                    href={evt.href}
+                    className="text-sm text-slate-600 hover:text-black"
+                  >
+                    Open →
+                  </a>
                 ) : null}
               </li>
             ))}
@@ -203,7 +226,9 @@ export default async function ProfilePage() {
 }
 
 function prettyType(t) {
-  return ({ ADD:"Added", RATE:"Rated", STATUS:"Updated status" }[t]) || "Updated";
+  return (
+    { ADD: "Added", RATE: "Rated", STATUS: "Updated status" }[t] || "Updated"
+  );
 }
 
 function iconFor(t) {
@@ -214,9 +239,11 @@ function iconFor(t) {
 }
 
 function iconTone(t) {
-  if (t === "ADD") return "bg-emerald-50 text-emerald-700 border border-emerald-200";
+  if (t === "ADD")
+    return "bg-emerald-50 text-emerald-700 border border-emerald-200";
   if (t === "RATE") return "bg-amber-50 text-amber-700 border border-amber-200";
-  if (t === "STATUS") return "bg-indigo-50 text-indigo-700 border border-indigo-200";
+  if (t === "STATUS")
+    return "bg-indigo-50 text-indigo-700 border border-indigo-200";
   return "bg-slate-100 text-slate-700 border border-slate-200";
 }
 
@@ -241,18 +268,22 @@ function Card({ title, children }) {
   );
 }
 
-
 function Row({ label, value, copyable }) {
   return (
     <div className="flex items-center justify-between gap-4">
       <span className="text-slate-600">{label}</span>
       <span className="text-slate-900 font-medium break-all">{value}</span>
-     {copyable ? (
-       <form action={`/api/copy?text=${encodeURIComponent(value || "")}`}>
-         <button type="submit" className="text-xs text-slate-600 hover:text-black">Copy</button>
-       </form>
-     ) : null}
-     {copyable ? <CopyButton text={value || ''} /> : null}
+      {copyable ? (
+        <form action={`/api/copy?text=${encodeURIComponent(value || "")}`}>
+          <button
+            type="submit"
+            className="text-xs text-slate-600 hover:text-black"
+          >
+            Copy
+          </button>
+        </form>
+      ) : null}
+      {copyable ? <CopyButton text={value || ""} /> : null}
     </div>
   );
 }
@@ -271,7 +302,10 @@ function EmptyState({ title, subtitle, ctaHref, ctaLabel }) {
       <h3 className="text-base font-medium">{title}</h3>
       <p className="text-slate-600 mt-1 text-sm">{subtitle}</p>
       {ctaHref ? (
-        <a href={ctaHref} className="inline-block mt-4 rounded-xl bg-black text-white px-4 py-2 text-sm hover:opacity-90">
+        <a
+          href={ctaHref}
+          className="inline-block mt-4 rounded-xl bg-black text-white px-4 py-2 text-sm hover:opacity-90"
+        >
           {ctaLabel}
         </a>
       ) : null}
