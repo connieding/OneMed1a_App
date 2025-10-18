@@ -76,7 +76,6 @@ public class UserController {
     public ResponseEntity<UserDTO> checkSignIn(@Valid @RequestBody LoginRequestDTO body, HttpServletResponse response) {
 
         userService.checkCredentials(body, response);
-        System.out.println("account check successful");
         return ResponseEntity.ok().build();
     }
 
@@ -102,7 +101,6 @@ public class UserController {
      */
     @GetMapping("/getprofile")
     public UserDTO getProfile(HttpServletRequest request) {
-        System.out.println("In UserController.getProfile");
         return userService.getCurrentUser(request);
     }
 

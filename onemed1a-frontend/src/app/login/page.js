@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkAccountDetails } from "@/api/userAPI";
+import { checkAccountDetails, getUserProfile } from "@/api/userAPI";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,16 +16,8 @@ export default function LoginPage() {
     setError("");
 
     try {
-      console.log("Sending login request...");
       await checkAccountDetails({ email, password });
-      console.log("Login request successful.");
-      setError("Login failed during authentication");
-
-      console.log("Login successful, fetching user...");
-      const res = await apiClient.get("/api/v1/getprofile"); // this sends the cookie
-
-      const user = res.data;
-      console.log("User:", user);
+      await getUserProfile(); // this sends the cookie
 
       router.push("/movie");
     } catch (err) {

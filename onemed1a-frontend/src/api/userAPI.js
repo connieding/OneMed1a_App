@@ -9,3 +9,10 @@ export async function createAccount(userDetails) {
   const response = await apiClient.post("/api/v1/createuser", userDetails);
   return response.data;
 }
+
+export async function getUserProfile() {
+  const response = await apiClient.get("/api/v1/getprofile", {
+    withCredentials: true,
+  });
+  return response.data;
+}

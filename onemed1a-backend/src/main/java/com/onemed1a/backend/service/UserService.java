@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
+/* Service class for managing user operations such as registration, login, profile management, and deactivation. */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -35,6 +36,12 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
 
     // --- Registration ---
+
+    /**
+     * Creates a new user.
+     * @param dto the user creation data
+     * @return the created user
+     */
     public UserDTO create(CreateUserDTO dto) {
 
 
@@ -57,31 +64,37 @@ public class UserService {
 
     // --- Login ---
 
+    /**
+     * Checks user credentials and sets JWT token as HttpOnly cookie if valid.
+     * 
+     * @param body the login request data
+     * @param response the HTTP response to set the cookie
+     */
     public void checkCredentials(LoginRequestDTO body, HttpServletResponse response) {
 
-        System.out.println("checked credentials called");
         User user = repo.findByEmail(body.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
 
-        System.out.println("user active: " + user.isActive());
         if (!user.isActive()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is inactive");
         }
 
-        System.out.println("password matches: " + passwordEncoder.matches(body.getPassword(), user.getPassword()));
         if (!passwordEncoder.matches(body.getPassword(), user.getPassword())) { 
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
-        System.out.println("generating token");
         // Generate JWT token and set it as HttpOnly cookie
         String token = jwtTokenProvider.generateToken(user.getId());
-        ResponseCookie cookie = buildAccessTokenCookie(token, 0);
+        ResponseCookie cookie = buildAccessTokenCookie(token, 86400); // 1 day
 
-        System.out.println("setting cookie");
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
+    /**
+     * Logs out the user by clearing the JWT token cookie.
+     * 
+     * @param response the HTTP response to clear the cookie
+     */
     public void logout(HttpServletResponse response) {
         ResponseCookie cookie = buildAccessTokenCookie("", 0);
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -89,6 +102,12 @@ public class UserService {
 
     // --- Get current user from token ---
 
+    /**
+     * Gets the current user based on the JWT token in the request cookies.
+     * 
+     * @param request the HTTP request containing the cookies
+     * @return the current user's profile
+     */
     public UserDTO getCurrentUser(HttpServletRequest request) {
         String token = Arrays.stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
                 .filter(c -> "access_token".equals(c.getName()))
@@ -96,7 +115,6 @@ public class UserService {
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing token"));
 
-        System.out.println("validating token");
         UUID userId = jwtTokenProvider.validateTokenAndGetUserId(token);
         User user = repo.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
@@ -106,6 +124,12 @@ public class UserService {
 
     // --- Profile operations ---
 
+    /**
+     * Gets a user by ID.
+     * 
+     * * @param id the user ID
+     * @return the user
+     */
     public UserDTO getById(UUID id) {
         User user = repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
@@ -117,6 +141,13 @@ public class UserService {
         return map(user);
     }
 
+    /**
+     * Updates a user's profile.
+     * 
+     * @param id the user ID
+     * @param dto the update data
+     * @return the updated user
+     */
     public UserDTO updateProfile(UUID id, UpdateUserDTO dto) {
         User user = repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
@@ -133,6 +164,11 @@ public class UserService {
         return map(repo.save(user));
     }
 
+    /**
+     * Deactivates a user account.
+     * 
+     * @param id the user ID
+     */
     public void deactivate(UUID id) {
         User user = repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
@@ -143,6 +179,15 @@ public class UserService {
         repo.save(user);
     }
 
+    // --- Helpers ---
+
+    /**
+     * Builds an HttpOnly cookie for the access token.
+     * 
+     * @param token the JWT token
+     * @param maxAge the max age of the cookie in seconds
+     * @return
+     */
     private ResponseCookie buildAccessTokenCookie(String token, long maxAge) {
         return ResponseCookie.from("access_token", token)
                 .httpOnly(true)

@@ -45,33 +45,33 @@ async function fetchJSON(path, init) {
 }
 
 export default async function ProfilePage() {
-  const cookieStore = await cookies();
-  const userId = cookieStore.get("userId")?.value;
-  if (!userId) redirect("/login");
+  // const cookieStore = await cookies();
+  // const userId = cookieStore.get("userId")?.value;
+  // if (!userId) redirect("/login");
 
   // Fetch profile core, stats, and recent activity from your backend:
-  const [profile, stats, activity] = await Promise.all([
-    fetchJSON(`/api/v1/users/${userId}`),
-    fetchJSON(`/api/v1/users/${userId}/stats`),
-    fetchJSON(`/api/v1/users/${userId}/activity?limit=10`),
-  ]);
+  // const [profile, stats, activity] = await Promise.all([
+  //   fetchJSON(`/api/v1/users/${userId}`),
+  //   fetchJSON(`/api/v1/users/${userId}/stats`),
+  //   fetchJSON(`/api/v1/users/${userId}/activity?limit=10`),
+  // ]);
 
-  const name = profile?.name || profile?.fullName || "Your Name";
-  const email = profile?.email || "you@example.com";
-  const joined = profile?.createdAt || profile?.joinedAt;
-  const avatarUrl = profile?.avatarUrl;
+  // const name = profile?.name || profile?.fullName || "Your Name";
+  // const email = profile?.email || "you@example.com";
+  // const joined = profile?.createdAt || profile?.joinedAt;
+  // const avatarUrl = profile?.avatarUrl;
 
-  const mediaStats = {
-    MOVIE: stats?.movieCount ?? 0,
-    TV: stats?.tvCount ?? 0,
-    MUSIC: stats?.musicCount ?? 0,
-    BOOKS: stats?.booksCount ?? 0,
-  };
+  // const mediaStats = {
+  //   MOVIE: stats?.movieCount ?? 0,
+  //   TV: stats?.tvCount ?? 0,
+  //   MUSIC: stats?.musicCount ?? 0,
+  //   BOOKS: stats?.booksCount ?? 0,
+  // };
 
   return (
     <div className="mx-auto max-w-6xl p-6 space-y-8">
       {/* Header */}
-      <section className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+      {/* <section className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
         <div className="relative">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -109,17 +109,17 @@ export default async function ProfilePage() {
             </a>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Stats */}
       <section>
         <h2 className="text-lg font-medium mb-3">Your library</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard label="Movies" value={mediaStats.MOVIE} href="/movie" />
           <StatCard label="TV" value={mediaStats.TV} href="/tv" />
           <StatCard label="Music" value={mediaStats.MUSIC} href="/music" />
           <StatCard label="Books" value={mediaStats.BOOKS} href="/books" />
-        </div>
+        </div> */}
       </section>
 
       {/* Preferences & badges */}
@@ -157,8 +157,8 @@ export default async function ProfilePage() {
 
         <Card title="Account">
           <div className="space-y-3 text-sm">
-            <Row label="Plan" value={profile?.plan || "Free"} />
-            <Row label="User ID" value={userId} copyable />
+            {/* <Row label="Plan" value={profile?.plan || "Free"} /> */}
+            {/* <Row label="User ID" value={userId} copyable /> */}
             <div className="pt-2">
               <form action={logout}>
                 <button
@@ -174,7 +174,7 @@ export default async function ProfilePage() {
       </section>
 
       {/* Recent activity */}
-      <section>
+      {/* <section>
         <h2 className="text-lg font-medium mb-3">Recent activity</h2>
         {Array.isArray(activity) && activity.length > 0 ? (
           <ul className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white/60 backdrop-blur">
@@ -220,7 +220,7 @@ export default async function ProfilePage() {
             ctaLabel="Browse now"
           />
         )}
-      </section>
+      </section> */}
     </div>
   );
 }
